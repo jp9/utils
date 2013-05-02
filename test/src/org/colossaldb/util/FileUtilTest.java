@@ -33,11 +33,6 @@ public class FileUtilTest {
     // New line string - system dependent
     private static final String NEW_LINE = System.getProperty("line.separator");
 
-    /**
-     * Test
-     *
-     * @throws java.io.IOException
-     */
     @Test
     public void singleLineTest() throws IOException {
 
