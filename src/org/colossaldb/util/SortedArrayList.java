@@ -56,26 +56,6 @@ public class SortedArrayList<E> extends ArrayList<E> {
         this(null, elements);
     }
 
-    @Override
-    public boolean equals(Object otherObj) {
-        if (null == otherObj)
-            return true;
-        if (!(otherObj instanceof List))
-            return false;
-
-        @SuppressWarnings("unchecked")
-        List<E> others = (List<E>) otherObj;
-        if (size() != others.size())
-            return false;
-
-        // It is NOT acceptable to change the internal order of elements in the other collection.
-        // Hence, we are forced to make a copy
-        others = new ArrayList<E>(others);
-        mySort(comparator, others);
-
-        return super.equals(others);
-    }
-
     /**
      * Sort the list.
      *

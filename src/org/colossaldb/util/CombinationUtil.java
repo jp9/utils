@@ -61,7 +61,7 @@ public class CombinationUtil {
             for (Set<Comparable<T>> currSet : combinations) {
                 for (Comparable<T> curr : collection) {
                     // If we have already used this object, then we should not use it again.
-                    if (containsReference(currSet, curr))
+                    if (currSet.contains(curr))
                         continue;
                     Set<Comparable<T>> tempCurrSet = new HashSet<Comparable<T>>(currSet);
                     tempCurrSet.add(curr);
@@ -110,23 +110,6 @@ public class CombinationUtil {
             c.add(new ComparableWrapper<T>(t));
         }
         return c;
-    }
-
-    /**
-     * Helper method to check if the collection already contains the element (equality by reference only)
-     *
-     * @param collection collection of elements
-     * @param element    element to search for
-     * @param <T>        element type
-     * @return where the collection contains the element by reference or not.
-     */
-    private static <T> boolean containsReference(Collection<T> collection, T element) {
-        for (T i : collection) {
-            // We are specifically checking for the reference equality.
-            if (i == element)
-                return true;
-        }
-        return false;
     }
 
     /**

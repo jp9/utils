@@ -38,6 +38,9 @@ public class FileUtil {
     private static final int CHAR_BUFFER_SIZE = 1048576;
 
 
+    private FileUtil() {
+    }
+
     /**
      * Given a Reader, simply return the contents as a list of strings. The new lines are stripped out of the returned value.
      * The new line is treated as the demarcation between lines.

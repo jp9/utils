@@ -46,10 +46,10 @@ public class CombinationUtilTest {
         Collection<Character> setOne = new SortedArrayList<Character>();
         setOne.add('r');
         expected.add(setOne);
-        setOne = new ArrayList<Character>();
+        setOne = new SortedArrayList<Character>();
         setOne.add('b');
         expected.add(setOne);
-        Assert.assertEquals(expected, makeExpectedOutput(input, 1));
+        Assert.assertEquals(expected, CombinationUtil.chooseRoutOfN(input, 1));
 
         expected.clear();
         setOne.clear();
@@ -64,7 +64,7 @@ public class CombinationUtilTest {
         setOne.add('b');
         setOne.add('b');
         expected.add(setOne);
-        Assert.assertEquals(expected, makeExpectedOutput(input, 2));
+        Assert.assertEquals(expected, CombinationUtil.chooseRoutOfN(input, 2));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class CombinationUtilTest {
 
     @Test
     public void testSpeed() {
-        List<Set<Set<Integer>>> testResults = new ArrayList<Set<Set<Integer>>>();
+        List<Set<Collection<Integer>>> testResults = new ArrayList<Set<Collection<Integer>>>();
         List<Set<Collection<Integer>>> prodRes = new ArrayList<Set<Collection<Integer>>>();
 
         Collection<Integer> input = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -92,7 +92,7 @@ public class CombinationUtilTest {
             prodRes.add(CombinationUtil.chooseRoutOfN(input, i));
         }
         endTime = System.nanoTime();
-        System.out.println("Time taken using test method: [" + (endTime - startTime) / 1000000L + "ms]");
+        System.out.println("Time taken using production method: [" + (endTime - startTime) / 1000000L + "ms]");
 
         for (int i = 0; i < 10; i++) {
             Assert.assertEquals(testResults.get(i), prodRes.get(i));
@@ -111,7 +111,7 @@ public class CombinationUtilTest {
      * @param <T>         - Object type of the elements in the input set.
      * @return - Set of ALL possible subsets, containing EXACTLY "r" items in each subset.
      */
-    public static <T> Set<Set<T>> makeExpectedOutput(Collection<T> collectionN, int r) {
+    public static <T> Set<Collection<T>> makeExpectedOutput(Collection<T> collectionN, int r) {
         Collection<T> setN = new HashSet<T>();
         setN.addAll(collectionN);
 
@@ -124,19 +124,21 @@ public class CombinationUtilTest {
         // Suppressing the warnings for IDEs.
         @SuppressWarnings("unchecked")
         T[] nums = (T[]) setN.toArray();
-        Set<Set<T>> all = new HashSet<Set<T>>();
+        Set<Collection<T>> all = new HashSet<Collection<T>>();
         for (T curr : nums) {
             if (r > 1) {
                 setN.remove(curr);
-                for (Set<T> currSubSet : makeExpectedOutput(setN, r - 1)) {
+                for (Collection<T> currSubSet : makeExpectedOutput(setN, r - 1)) {
                     currSubSet.add(curr);
                     all.add(currSubSet);
                 }
                 setN.add(curr);
             } else {
-                Set<T> simpleSet = new HashSet<T>();
-                simpleSet.add(curr);
-                all.add(simpleSet);
+                // Note: This can be a set but will break the comparison to the
+                // output.
+                Collection<T> simpleList = new SortedArrayList<T>();
+                simpleList.add(curr);
+                all.add(simpleList);
             }
         }
         return all;
