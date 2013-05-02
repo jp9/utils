@@ -9,6 +9,21 @@ import java.util.Arrays;
 import java.util.Collections;
 
 /**
+ * Copyright (C) 2013  Jayaprakash Pasala
+ * <p/>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * <p/>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * <p/>
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * <p/>
  * Created with IntelliJ IDEA.
  * User: Jayaprakash Pasala
  * Date: 4/29/13
@@ -20,6 +35,7 @@ public class FileUtilTest {
 
     /**
      * Test
+     *
      * @throws java.io.IOException
      */
     @Test
@@ -35,9 +51,9 @@ public class FileUtilTest {
     @Test
     public void multiLineTest() throws IOException {
         // Multi line string parsing
-        String multiLineStr = "This is line one"+NEW_LINE+" line two "+NEW_LINE+" line three ";
+        String multiLineStr = "This is line one" + NEW_LINE + " line two " + NEW_LINE + " line three ";
         Assert.assertEquals(multiLineStr, FileUtil.getFileAsString(new StringReader(multiLineStr)));
-        Assert.assertEquals(Arrays.asList("This is line one"," line two ", " line three "),
+        Assert.assertEquals(Arrays.asList("This is line one", " line two ", " line three "),
                 FileUtil.getFileAsStrings(new StringReader(multiLineStr)));
 
     }
@@ -54,7 +70,7 @@ public class FileUtilTest {
     @Test
     public void newLineStringTest() throws IOException {
         // New line only test
-        String newLineStr = ""+NEW_LINE;
+        String newLineStr = "" + NEW_LINE;
         Assert.assertEquals(newLineStr, FileUtil.getFileAsString(new StringReader(newLineStr)));
         Assert.assertEquals(Arrays.asList(""), // Remember that this method will not retain the new lines.
                 FileUtil.getFileAsStrings(new StringReader(newLineStr)));

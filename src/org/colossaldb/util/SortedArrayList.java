@@ -3,92 +3,124 @@ package org.colossaldb.util;
 import java.util.*;
 
 /**
+ * Copyright (C) 2013  Jayaprakash Pasala
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Created with IntelliJ IDEA.
+ * User: Jayaprakash Pasala
+ * Date: 4/29/13
+ * Time: 9:15 PM
+ *
+ *
+ */
+
+/**
  * SortedArrayList is extension of array list with added benefits of keeping all the elements sorted.
- * This is NOT EFFICIENT, I will fix it when time permits.
+ * This is NOT EFFICIENT but works good enough for small data sets.
  *
  * @param <E> - the parameter type.
  */
 
 public class SortedArrayList<E> extends ArrayList<E> {
-        final Comparator<E> comparator;
+    final Comparator<E> comparator;
 
-        SortedArrayList() {
-            this((Comparator<E>) null);
-        }
+    public SortedArrayList() {
+        this((Comparator<E>) null);
+    }
 
-        SortedArrayList(Comparator<E> comparator) {
-            super();
-            this.comparator = comparator;
-        }
+    public SortedArrayList(Comparator<E> comparator) {
+        super();
+        this.comparator = comparator;
+    }
 
-        SortedArrayList(Comparator<E> comparator, Collection<E> elements) {
-            // Don't call the super with elements as argument as we have to sort them.
-            super();
-            this.comparator = comparator;
-            addAll(elements);
-        }
+    public SortedArrayList(Comparator<E> comparator, Collection<E> elements) {
+        // Don't call the super with elements as argument as we have to sort them.
+        super();
+        this.comparator = comparator;
+        addAll(elements);
+    }
 
-        SortedArrayList(Collection<E> elements) {
-            this(null, elements);
-        }
+    public SortedArrayList(Collection<E> elements) {
+        this(null, elements);
+    }
 
-        @Override
-        public boolean equals(Object otherObj) {
-            if (null == otherObj)
-                return true;
-            if (!(otherObj instanceof List))
-                return false;
+    @Override
+    public boolean equals(Object otherObj) {
+        if (null == otherObj)
+            return true;
+        if (!(otherObj instanceof List))
+            return false;
 
-            @SuppressWarnings("unchecked")
-            List<E> others = (List<E>) otherObj;
-            if (size() != others.size())
-                return false;
+        @SuppressWarnings("unchecked")
+        List<E> others = (List<E>) otherObj;
+        if (size() != others.size())
+            return false;
 
-            // It is NOT acceptable to change the internal order of elements in the other collection.
-            // Hence, we are forced to make a copy
-            others = new ArrayList<E>(others);
-            mySort(comparator, others);
+        // It is NOT acceptable to change the internal order of elements in the other collection.
+        // Hence, we are forced to make a copy
+        others = new ArrayList<E>(others);
+        mySort(comparator, others);
 
-            return super.equals(others);
-        }
+        return super.equals(others);
+    }
 
+    /**
+     * Sort the list.
+     *
+     * @param comparator Comparator to use
+     * @param list       list
+     * @param <T>        parameter type of the list
+     */
+    @SuppressWarnings("unchecked")
     private static <T> void mySort(Comparator<T> comparator, List<T> list) {
         if (comparator == null)
-            // Hack: If we don't have a comparator, let us see if the underlying object itself implements comparable
-            Collections.sort((List<? extends Comparable>)list);
+            // Hack: This will fail, if the underlying object of type <T> does not implement Comparable interface
+            Collections.sort((List<? extends Comparable>) list);
         else
             Collections.sort(list, comparator);
     }
 
     @Override
-        public int hashCode() {
-            return super.hashCode();
-        }
+    public int hashCode() {
+        return super.hashCode();
+    }
 
-        @Override
-        public boolean add(E element) {
-            boolean result = super.add(element);
-            mySort(comparator, this);
-            return result;
-        }
+    @Override
+    public boolean add(E element) {
+        boolean result = super.add(element);
+        mySort(comparator, this);
+        return result;
+    }
 
-        @Override
-        public void add(int index, E element) {
-            super.add(index, element);
-            mySort(comparator, this);
-        }
+    @Override
+    public void add(int index, E element) {
+        super.add(index, element);
+        mySort(comparator, this);
+    }
 
-        @Override
-        public boolean addAll(Collection<? extends E> eCollection) {
-            boolean result = super.addAll(eCollection);
-            mySort(comparator, this);
-            return result;
-        }
+    @Override
+    public boolean addAll(Collection<? extends E> eCollection) {
+        boolean result = super.addAll(eCollection);
+        mySort(comparator, this);
+        return result;
+    }
 
-        @Override
-        public boolean addAll(int index, Collection<? extends E> eCollection) {
-            boolean result = super.addAll(index, eCollection);
-            mySort(comparator, this);
-            return result;
-        }
+    @Override
+    public boolean addAll(int index, Collection<? extends E> eCollection) {
+        boolean result = super.addAll(index, eCollection);
+        mySort(comparator, this);
+        return result;
+    }
 }
