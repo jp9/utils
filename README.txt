@@ -1,5 +1,5 @@
 General utilities, some notable uses:
-- Sorted array (sortedArrayList)
+- Sorted list. (See: SortedArrayList.java)
 - Combination utilities. 
 	- Get all the possible combinations.
 - Minor file utilities
