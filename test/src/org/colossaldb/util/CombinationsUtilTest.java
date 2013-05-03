@@ -26,59 +26,66 @@ import java.util.*;
  * Date: 4/29/13
  * Time: 9:15 PM
  */
-public class CombinationUtilTest {
+
+/**
+ * Test class for testing combinations
+ */
+public class CombinationsUtilTest {
     @Test
     public void testChooseRoutOfNForSize() {
-        Assert.assertEquals(9, CombinationUtil.chooseRoutOfN(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9), 1).size());
-        Assert.assertEquals(36, CombinationUtil.chooseRoutOfN(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9), 2).size());
-        Assert.assertEquals(84, CombinationUtil.chooseRoutOfN(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9), 3).size());
-        Assert.assertEquals(126, CombinationUtil.chooseRoutOfN(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9), 4).size());
-        Assert.assertEquals(126, CombinationUtil.chooseRoutOfN(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9), 5).size());
-        Assert.assertEquals(84, CombinationUtil.chooseRoutOfN(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9), 6).size());
-        Assert.assertEquals(36, CombinationUtil.chooseRoutOfN(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9), 7).size());
-        Assert.assertEquals(9, CombinationUtil.chooseRoutOfN(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9), 8).size());
+        List<Integer> inputList = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        int size = inputList.size();
+        int factorialOf9 = CombinatoricUtil.factorial(size);
+        for (int i = 1; i <= size; i++) {
+            int expectedValue = factorialOf9 / (CombinatoricUtil.factorial(size - i) * CombinatoricUtil.factorial(i));
+            Assert.assertEquals(expectedValue, CombinatoricUtil.combinations(inputList, i).size());
+        }
     }
 
     @Test
     public void testChooseRedAndBlack() {
         Collection<Character> input = Arrays.asList('r', 'r', 'b', 'b', 'b');
-        Set<Collection<Character>> expected = new HashSet<Collection<Character>>();
-        Collection<Character> setOne = new SortedArrayList<Character>();
-        setOne.add('r');
-        expected.add(setOne);
-        setOne = new SortedArrayList<Character>();
-        setOne.add('b');
-        expected.add(setOne);
-        Assert.assertEquals(expected, CombinationUtil.chooseRoutOfN(input, 1));
+        // select one from input array
+        Set<Collection<Character>> expected = makeSet(new Character[][]{{'r'}, {'b'}});
+        Assert.assertEquals(expected, CombinatoricUtil.combinations(input, 1));
 
-        expected.clear();
-        setOne.clear();
-        setOne.add('r');
-        setOne.add('r');
-        expected.add(setOne);
-        setOne = new SortedArrayList<Character>();
-        setOne.add('r');
-        setOne.add('b');
-        expected.add(setOne);
-        setOne = new SortedArrayList<Character>();
-        setOne.add('b');
-        setOne.add('b');
-        expected.add(setOne);
-        Assert.assertEquals(expected, CombinationUtil.chooseRoutOfN(input, 2));
+        // Select any two from input array
+        Assert.assertEquals(makeSet(new Character[][]{{'r', 'r'}, {'r', 'b'}, {'b', 'b'}}),
+                CombinatoricUtil.combinations(input, 2));
+
+        // select three from input array
+        Assert.assertEquals(makeSet(new Character[][]{{'r', 'r', 'b'}, {'r', 'b', 'b'}, {'b', 'b', 'b'}}),
+                CombinatoricUtil.combinations(input, 3));
+    }
+
+    /**
+     * Helper method to make a set of collections.
+     *
+     * @param elements - Input array
+     * @param <E>      - element type
+     * @return - set of collections.
+     */
+    private static <E> Set<Collection<E>> makeSet(E[][] elements) {
+        Set<Collection<E>> all = new HashSet<Collection<E>>();
+        for (E[] currArray : elements) {
+            Collection<E> list = new SortedArrayList<E>(Arrays.asList(currArray));
+            all.add(list);
+        }
+        return all;
     }
 
     @Test
     public void testChooseRoutOfN() {
         Collection<Integer> input = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
         for (int i = 1; i <= 10; i++) {
-            Assert.assertEquals(makeExpectedOutput(input, i), CombinationUtil.chooseRoutOfN(input, i));
+            Assert.assertEquals(makeExpectedOutput(input, i), CombinatoricUtil.combinations(input, i));
         }
     }
 
     @Test
     public void testSpeed() {
         List<Set<Collection<Integer>>> testResults = new ArrayList<Set<Collection<Integer>>>();
-        List<Set<Collection<Integer>>> prodRes = new ArrayList<Set<Collection<Integer>>>();
+        List<Collection<Collection<Integer>>> prodRes = new ArrayList<Collection<Collection<Integer>>>();
 
         Collection<Integer> input = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
         long startTime = System.nanoTime();
@@ -89,7 +96,7 @@ public class CombinationUtilTest {
         System.out.println("Time taken using test method: [" + (endTime - startTime) / 1000000L + "ms]");
         startTime = System.nanoTime();
         for (int i = 1; i <= 10; i++) {
-            prodRes.add(CombinationUtil.chooseRoutOfN(input, i));
+            prodRes.add(CombinatoricUtil.combinations(input, i));
         }
         endTime = System.nanoTime();
         System.out.println("Time taken using production method: [" + (endTime - startTime) / 1000000L + "ms]");

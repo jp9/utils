@@ -28,28 +28,61 @@ import java.util.*;
 /**
  * Utility class for helping solve mathematical combination problems/puzzles.
  */
-public class CombinationUtil {
+class CombinatoricHelperUtil {
+    static final CombinatoricHelperUtil COMBINATIONS = new CombinatoricHelperUtil();
+
+    static final CombinatoricHelperUtil PERMUTATIONS = new CombinatoricHelperUtil() {
+        @Override
+        protected <E> Collection<E> makeCollection() {
+            return new ArrayList<E>();
+        }
+
+        @Override
+        protected <E> Collection<E> makeCollectionStore() {
+            return new ArrayList<E>();
+        }
+
+    };
+
     // Prevent instantiation of utility classes.
-    private CombinationUtil() {
+    private CombinatoricHelperUtil() {
+    }
+
+    protected <E> Collection<E> makeCollection() {
+        return new SortedArrayList<E>();
+    }
+
+    protected <E> Collection<E> makeCollectionStore() {
+        return new HashSet<E>();
     }
 
     /**
      * Simple implementation for:  choosing a set R items out of a given collection containing N items.
      *
+     * @param util         CombinatoricHelperUtil instance to use.
      * @param collectionIn the original collection of objects
      * @param r            the number of elements we want to select out of the original collection
      * @return Sets of all the possible combinations.
      */
-    public static <T extends Comparable<T>> Set<Collection<T>> chooseRoutOfN(Collection<T> collectionIn, int r) {
-        // Duplicates in the input list cause a lot of problems.
+    static <T extends Comparable<T>> Collection<Collection<T>> chooseRoutOfN(CombinatoricHelperUtil util, Collection<T> collectionIn, int r) {
+        if (r == 0 || r > collectionIn.size())
+            return Collections.emptySet();
+
+        // Duplicates objects in the input list will cause problem for collection comparisons
+        // For example:
+        //      List<Character> list = Arrays.asList('a', 'b', 'c', 'a');
+        //      The exact same object can be the first and last object, when using sets we will not be allowed to create
+        //      a set with two 'a' objects
+        //
         // We can use sets and simplify logic if we don't have duplicates.
         // To work around the duplicates, we are simply going to create a
         // wrapper object for all objects.
+        //
         Collection<? extends Comparable<T>> collection = addWrapper(collectionIn);
 
-        Set<Set<Comparable<T>>> combinations = new HashSet<Set<Comparable<T>>>();
+        Collection<Collection<Comparable<T>>> combinations = util.makeCollectionStore();
         for (Comparable<T> currT : collection) {
-            Set<Comparable<T>> currSet = new HashSet<Comparable<T>>();
+            Collection<Comparable<T>> currSet = util.makeCollectionStore();
             currSet.add(currT);
             combinations.add(currSet);
         }
@@ -57,13 +90,14 @@ public class CombinationUtil {
 
         // Iterate to add other elements now.
         while (r > 0) {
-            Set<Set<Comparable<T>>> newCombinations = new HashSet<Set<Comparable<T>>>();
-            for (Set<Comparable<T>> currSet : combinations) {
+            Collection<Collection<Comparable<T>>> newCombinations = util.makeCollectionStore();
+            for (Collection<Comparable<T>> currSet : combinations) {
                 for (Comparable<T> curr : collection) {
                     // If we have already used this object, then we should not use it again.
                     if (currSet.contains(curr))
                         continue;
-                    Set<Comparable<T>> tempCurrSet = new HashSet<Comparable<T>>(currSet);
+                    Collection<Comparable<T>> tempCurrSet = util.makeCollectionStore();
+                    tempCurrSet.addAll(currSet);
                     tempCurrSet.add(curr);
                     newCombinations.add(tempCurrSet);
                 }
@@ -74,20 +108,20 @@ public class CombinationUtil {
             r--;
         }
 
-        return removeWrapper(combinations);
+        return removeWrapper(util, combinations);
     }
 
     /**
      * Create an equivalent collection that contains the original object instead of the wrapper object.
      *
+     * @param util         - CombinatoricHelperUtil object (either COMBINATION or PERMUTATION).
      * @param combinations the input collection that contains the wrapper object.
-     * @param <T>          object type
      * @return collection of objects instead of the wrapper object
      */
-    private static <T extends Comparable<T>> Set<Collection<T>> removeWrapper(Set<Set<Comparable<T>>> combinations) {
+    private static <T extends Comparable<T>> Collection<Collection<T>> removeWrapper(CombinatoricHelperUtil util, Collection<Collection<Comparable<T>>> combinations) {
         Set<Collection<T>> result = new HashSet<Collection<T>>();
-        for (Set<Comparable<T>> combination : combinations) {
-            List<T> list = new SortedArrayList<T>();
+        for (Collection<Comparable<T>> combination : combinations) {
+            Collection<T> list = util.makeCollection();
             for (Comparable<T> t : combination) {
                 list.add(((ComparableWrapper<T>) t).holder);
             }
