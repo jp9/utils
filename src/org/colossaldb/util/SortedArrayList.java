@@ -187,7 +187,7 @@ public class SortedArrayList<E> extends ArrayList<E> {
 
     @SuppressWarnings("unchecked")
     private int internalCompare(E element1, E element2) {
-        int compareVal = -1;
+        int compareVal;
         if (comparator == null) {
             if (element1 instanceof Comparable) {
                 compareVal = ((Comparable) element1).compareTo(element2);
