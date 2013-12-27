@@ -27,12 +27,19 @@ import java.util.*;
  */
 
 /**
- * SortedArrayList is extension of array list with added benefits of keeping all the elements sorted.
- * This is NOT EFFICIENT but works good enough for small data sets.
+ * SortedArrayList is extension of array list with added benefits of keeping all the elements sorted. Null elements are not
+ * permitted in the list.
+ * This is NOT THE MOST EFFICIENT but works good enough for most data sets. This data structure is NOT thread safe.
+ * <p/>
+ * The sorted array list uses insertion sort as the internal algorithm for single inserts and uses merge sort
+ * for bulk inserts. Efficiency wise, construction of this array with all the elements at the start will perform the best.
+ * <p/>
+ * Ideally restrict to a few insertion of elements.
+ * <p/>
+ * Other thoughts: We could use a tree representation internally.
  *
  * @param <E> - the parameter type.
  */
-
 public class SortedArrayList<E> extends ArrayList<E> {
     final Comparator<E> comparator;
 
@@ -64,7 +71,7 @@ public class SortedArrayList<E> extends ArrayList<E> {
      * @param <T>        parameter type of the list
      */
     @SuppressWarnings("unchecked")
-    private static <T> void mySort(Comparator<T> comparator, List<T> list) {
+    private static <T> void mySort(Comparator<T> comparator, List<? extends T> list) {
         if (comparator == null)
             // Hack: This will fail, if the underlying object of type <T> does not implement Comparable interface
             Collections.sort((List<? extends Comparable>) list);
@@ -77,30 +84,125 @@ public class SortedArrayList<E> extends ArrayList<E> {
         return super.hashCode();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean add(E element) {
-        boolean result = super.add(element);
-        mySort(comparator, this);
-        return result;
+        if (super.isEmpty()) {
+            return super.add(element);
+        }
+
+        // Binary search to find where this element needs to be added.
+        int left = 0, right = super.size() - 1;
+        int mid = 0, compareVal = 0;
+        for (; left <= right; ) {
+            mid = (left + right) / 2;
+            compareVal = internalCompare(element, super.get(mid));
+            if (compareVal == 0) {
+                break; // We return true if the collection changed.
+            }
+
+            if (compareVal < 0) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+
+        // Add the element in correct location.
+        if (compareVal < 0)
+            super.add(mid, element);
+        else
+            super.add(mid + 1, element);
+
+        E prev = super.get(0);
+        for (int i = 1; i < super.size(); i++) {
+            if (comparator != null) {
+                if (comparator.compare(prev, super.get(i)) > 0) {
+                    throw new RuntimeException("Programming error");
+                }
+            } else {
+                if (prev instanceof Comparable) {
+                    if (((Comparable) prev).compareTo(super.get(i)) > 0) {
+                        throw new RuntimeException("Programming error");
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     @Override
     public void add(int index, E element) {
-        super.add(index, element);
-        mySort(comparator, this);
+        throw new UnsupportedOperationException("Insertion at a specified position is not permitted as this operation might break" +
+                " the order of elements in the sorted list.");
     }
 
+    /**
+     * Sort the input collection and then merge it with the existing list (using simple merge sort algorithm).
+     *
+     * @param eCollection - the collection to be added.
+     * @return - returns "true" if the collection is changed.
+     */
     @Override
     public boolean addAll(Collection<? extends E> eCollection) {
-        boolean result = super.addAll(eCollection);
-        mySort(comparator, this);
-        return result;
+        if (eCollection == null || eCollection.isEmpty())
+            return false;
+
+        List<? extends E> newElements = new ArrayList<E>(eCollection);
+        mySort(comparator, newElements);
+        List<E> localList = new ArrayList<E>(super.size() + eCollection.size());
+        Iterator<E> first = super.iterator();
+        Iterator<? extends E> second = newElements.iterator();
+        for (E firstObj = getNext(first), secondObj = getNext(second); firstObj != null || secondObj != null; ) {
+            if (firstObj == null) {
+                localList.add(secondObj);
+                secondObj = getNext(second);
+                continue;
+            }
+
+            if (secondObj == null) {
+                localList.add(firstObj);
+                firstObj = getNext(first);
+                continue;
+            }
+
+            int compareVal = internalCompare(firstObj, secondObj);
+            if (compareVal < 0) {
+                localList.add(firstObj);
+                firstObj = getNext(first);
+            } else {
+                localList.add(secondObj);
+                secondObj = getNext(second);
+            }
+        }
+
+        super.clear();
+        super.addAll(localList);
+        return true;
+    }
+
+    private E getNext(Iterator<? extends E> iterator) {
+        return iterator.hasNext() ? iterator.next() : null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private int internalCompare(E element1, E element2) {
+        int compareVal = -1;
+        if (comparator == null) {
+            if (element1 instanceof Comparable) {
+                compareVal = ((Comparable) element1).compareTo(element2);
+            } else {
+                throw new RuntimeException("Cannot cast [" + element1 + "] element to Comparable. The comparator must be set in the constructor for SortedArrayList.");
+            }
+        } else {
+            compareVal = comparator.compare(element1, element2);
+        }
+        return compareVal;
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> eCollection) {
-        boolean result = super.addAll(index, eCollection);
-        mySort(comparator, this);
-        return result;
+        throw new UnsupportedOperationException("Insertion at a specified position is not permitted as this operation might break" +
+                " the order of elements in the sorted list.");
     }
 }
