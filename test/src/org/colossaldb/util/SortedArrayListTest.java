@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created with IntelliJ IDEA.
@@ -80,6 +82,24 @@ public class SortedArrayListTest {
         initial.add(6);
         Assert.assertArrayEquals(new Integer[]{-10, 3, 3, 4, 5, 6, 7},
                 initial.toArray(new Integer[initial.size()]));
+    }
+
+    @Test
+    public void testRandom() {
+        Random r = new Random(System.currentTimeMillis());
+        final int seedSize = 50;
+        List<Integer> inputList = new SortedArrayList<Integer>();
+        for (int i = 0; i < seedSize; i++)
+            inputList.add(r.nextInt());
+
+        String errMsg = inputList.toString();
+        // Verify that the elements are in order.
+        for (int i = 1; i < seedSize; i++) {
+            int prev = inputList.get(i - 1);
+            int curr = inputList.get(i);
+            Assert.assertTrue("Array is not sorted: " + errMsg, prev <= curr);
+        }
+
     }
 }
 

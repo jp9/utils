@@ -114,20 +114,6 @@ public class SortedArrayList<E> extends ArrayList<E> {
         else
             super.add(mid + 1, element);
 
-        E prev = super.get(0);
-        for (int i = 1; i < super.size(); i++) {
-            if (comparator != null) {
-                if (comparator.compare(prev, super.get(i)) > 0) {
-                    throw new RuntimeException("Programming error");
-                }
-            } else {
-                if (prev instanceof Comparable) {
-                    if (((Comparable) prev).compareTo(super.get(i)) > 0) {
-                        throw new RuntimeException("Programming error");
-                    }
-                }
-            }
-        }
         return true;
     }
 
